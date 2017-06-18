@@ -20,13 +20,13 @@ public class CoordinateSystemBase {
 
     private static double startTime; //seconds
 
-    static final double timeBetweenReadings = 0.05D;
+    static final double timeBetweenReadings = 0.005/pow(2,2);
 
     static final double timeBetweenReadingsSquared = pow(timeBetweenReadings, 2);
 
     public static double elapsedTime() { //seconds
 
-        return (System.currentTimeMillis()/1000D) - startTime;
+        return (System.nanoTime()/pow(10,9)) - startTime;
     }
 
     public static void delayUntil(double delayAmt) { //delays for `delayAmt` seconds after the program start
@@ -35,7 +35,6 @@ public class CoordinateSystemBase {
     }
 
     public static double[] calculateMove(double angle, Function<Double, Double> acceleration, double totalTime) {
-
 
         double sum = 0;
         double accelerationResult;
@@ -47,16 +46,17 @@ public class CoordinateSystemBase {
             else return timeBetweenReadings * ceil(foo);
         };
 
-        startTime = System.currentTimeMillis()/1000D;
-        while (elapsedTime() < totalTime) {
+        startTime = System.nanoTime()/pow(10,9);
+        while (elapsedTime() < totalTime - timeBetweenReadings) {
 
-            //if(elapsedTime() > benchmark) throw new RuntimeException("Benchmark was passed due to small margins; increase the value of TIME_BETWEEN_READINGS" + " currentTime: " + elapsedTime() + " benchmark: " + benchmark); //this line causes first number to be skipped
+            if(elapsedTime() > benchmark) throw new RuntimeException("Benchmark was passed due to small margins; increase the value of TIME_BETWEEN_READINGS" + " currentTime: " + elapsedTime() + " benchmark: " + benchmark); //this line causes first number to be skipped
+            delayUntil(benchmark);
             accelerationResult = acceleration.apply(elapsedTime());
             benchmark = timeForNextReading.apply(-1D);
             sum += accelerationResult; // * TIME_BETWEEN_READINGS; should be multiplied with TIME_BETWEEN_READINGS, but it's faster to multiply with the squared version, so it helps not miss the benchmark
             incrementX(sum * timeBetweenReadingsSquared * Math.sin(angle * PI/180D));
             incrementY(sum * timeBetweenReadingsSquared * Math.cos(angle * PI/180D));
-            delayUntil(benchmark);
+
         }
 
         System.out.printf("%f\n", elapsedTime());

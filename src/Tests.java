@@ -16,7 +16,7 @@ public class Tests  {
     double totalTime;
     double[] expectedResult = new double[2];
     double[] actualResult;
-    final double DELTA = 0.000001;
+    final double DELTA = 0.01;
     final double X_ANGLE = 90; //y = 0
     final double Y_ANGLE = 0; //x = 0
     final double XY_ANGLE = 90 - atan(2)*180/PI; //y = 2x
@@ -32,7 +32,7 @@ public class Tests  {
 
         startAngle = X_ANGLE;
         acceleration = t -> 0D;
-        totalTime = 5D;
+        totalTime = 1D;
         expectedResult[0] = 0;
         expectedResult[1] = 0;
         actualResult = CoordinateSystemBase.calculateMove(startAngle, acceleration, totalTime);
@@ -56,7 +56,7 @@ public class Tests  {
 
         startAngle = Y_ANGLE;
         acceleration = t -> 0D;
-        totalTime = 5D;
+        totalTime = 1D;
         expectedResult[0] = 0;
         expectedResult[1] = 0;
         actualResult = CoordinateSystemBase.calculateMove(startAngle, acceleration, totalTime);
@@ -92,7 +92,7 @@ public class Tests  {
 
         startAngle = XY_ANGLE;
         acceleration = t -> 0D;
-        totalTime = 5D;
+        totalTime = 1D;
         expectedResult[0] = 0;
         expectedResult[1] = 0;
         actualResult = CoordinateSystemBase.calculateMove(startAngle, acceleration, totalTime);
