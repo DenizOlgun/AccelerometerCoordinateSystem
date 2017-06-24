@@ -7,7 +7,6 @@ public class CoordinateSystemBase {
     private static double x = 0; //x+ right, x- left
     private static double y = 0; //y+ up, y- down
 
-
     public static void incrementX(double incrementVal) {
 
         x += incrementVal;
@@ -20,9 +19,9 @@ public class CoordinateSystemBase {
 
     private static double startTime; //seconds
 
-    static final double timeBetweenReadings = 0.005/pow(2,2);
+    static final double TIME_BETWEEN_READINGS = 0.005/pow(2,2);
 
-    static final double timeBetweenReadingsSquared = pow(timeBetweenReadings, 2);
+    static final double TIME_BETWEEN_READINGS_SQUARED = pow(TIME_BETWEEN_READINGS, 2);
 
     public static double elapsedTime() { //seconds
 
@@ -38,25 +37,24 @@ public class CoordinateSystemBase {
 
         double sum = 0;
         double accelerationResult;
-        double benchmark = timeBetweenReadings; //initial benchmark
-        Function<Double, Double> timeForNextReading = (a) -> {
+        double timeForNextReading = TIME_BETWEEN_READINGS; //initial timeForNextReading
+        Function<Double, Double> getTimeForNextReading = (a) -> {
 
-            double foo = elapsedTime() / timeBetweenReadings;
-            if(rint(foo) == foo) return timeBetweenReadings * (foo + 1);
-            else return timeBetweenReadings * ceil(foo);
+            double tempStoreValue = elapsedTime() / TIME_BETWEEN_READINGS;
+            if(rint(tempStoreValue) == tempStoreValue) return TIME_BETWEEN_READINGS * (tempStoreValue + 1);
+            else return TIME_BETWEEN_READINGS * ceil(tempStoreValue);
         };
 
         startTime = System.nanoTime()/pow(10,9);
-        while (elapsedTime() < totalTime - timeBetweenReadings) {
+        while (elapsedTime() < totalTime - TIME_BETWEEN_READINGS) {
 
-            if(elapsedTime() > benchmark) throw new RuntimeException("Benchmark was passed due to small margins; increase the value of TIME_BETWEEN_READINGS" + " currentTime: " + elapsedTime() + " benchmark: " + benchmark); //this line causes first number to be skipped
-            delayUntil(benchmark);
+            if(elapsedTime() > timeForNextReading) throw new RuntimeException("Benchmark was passed due to small margins; increase the value of TIME_BETWEEN_READINGS" + " currentTime: " + elapsedTime() + " timeForNextReading: " + timeForNextReading); //this line causes first number to be skipped
+            delayUntil(timeForNextReading);
             accelerationResult = acceleration.apply(elapsedTime());
-            benchmark = timeForNextReading.apply(-1D);
-            sum += accelerationResult; // * TIME_BETWEEN_READINGS; should be multiplied with TIME_BETWEEN_READINGS, but it's faster to multiply with the squared version, so it helps not miss the benchmark
-            incrementX(sum * timeBetweenReadingsSquared * Math.sin(angle * PI/180D));
-            incrementY(sum * timeBetweenReadingsSquared * Math.cos(angle * PI/180D));
-
+            timeForNextReading = getTimeForNextReading.apply(-1D);
+            sum += accelerationResult; // * TIME_BETWEEN_READINGS; should be multiplied with TIME_BETWEEN_READINGS, but it's faster to multiply with the squared version, so it helps not miss the timeForNextReading
+            incrementX(sum * TIME_BETWEEN_READINGS_SQUARED * Math.sin(angle * PI/180D));
+            incrementY(sum * TIME_BETWEEN_READINGS_SQUARED * Math.cos(angle * PI/180D));
         }
 
         System.out.printf("%f\n", elapsedTime());
@@ -66,15 +64,14 @@ public class CoordinateSystemBase {
         System.out.println();
         System.out.println("Calculated magnitude: " + sqrt(x*x + y*y));
         System.out.println();
-        System.out.println("Time between each reading: " + timeBetweenReadings);
+        System.out.println("Time between each reading: " + TIME_BETWEEN_READINGS);
         System.out.println("Fixed angle: " + angle + " degrees");
-        System.out.println("Final Velocity: " + sum * timeBetweenReadings);
+        System.out.println("Final Velocity: " + sum * TIME_BETWEEN_READINGS);
 
-        double[] result = new double[2];
-        //double correctionFactor = 100D/101;
-        result[0] = x;// * 100D / 101D;
-        result[1] = y;// * 100D / 101D;
-        return result;
+        double[] XYPosition = new double[2];
+        XYPosition[0] = x;
+        XYPosition[1] = y;
+        return XYPosition;
     }
 
     public static void reset() { //see the reset() comment in Tests
